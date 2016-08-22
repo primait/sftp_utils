@@ -131,7 +131,10 @@ ensure_dir(Path, Config) ->
               P = filename:join(P0, Component),
               case ssh_sftp:read_file_info(Pid, P, Timeout) of
                 {ok, _} -> ok;
-                {error, Rsn} -> ok = ssh_sftp:make_dir(Pid, P, Timeout)
+                {error, Rsn}
+                  when Rsn =:= enoent;
+                       Rsn =:= no_such_file ->
+                  ok = ssh_sftp:make_dir(Pid, P, Timeout)
               end,
               P
           end, Hd, Tl),
